@@ -29,9 +29,8 @@ The current menu contains seven operations:
 6. Turn the battery indicator LED on
 7. Turn the battery indicator LED off
 
-Battery clear-errors/reset commands are intentionally not included. Those
-commands can change battery safety state and require a separate guarded
-workflow with cell, temperature, and physical-condition checks.
+Battery clear-errors/reset commands are  not included. 
+
 
 ## Hardware
 
