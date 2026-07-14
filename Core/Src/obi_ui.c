@@ -5,7 +5,7 @@
 #include "makita_obi.h"
 #include "st7567.h"
 
-#define OBI_UI_ITEM_COUNT 5U
+#define OBI_UI_ITEM_COUNT 7U
 #define OBI_UI_LINE_SIZE 20U
 
 enum
@@ -14,7 +14,9 @@ enum
   OBI_UI_MODEL,
   OBI_UI_VOLTAGES,
   OBI_UI_TEMPERATURE,
-  OBI_UI_STATUS
+  OBI_UI_STATUS,
+  OBI_UI_LED_ON,
+  OBI_UI_LED_OFF
 };
 
 static const char *const menu_names[OBI_UI_ITEM_COUNT] =
@@ -23,7 +25,9 @@ static const char *const menu_names[OBI_UI_ITEM_COUNT] =
   "MODEL",
   "CELL VOLTAGES",
   "TEMPERATURE",
-  "STATUS"
+  "STATUS",
+  "LED ON",
+  "LED OFF"
 };
 
 static uint8_t selected_item;
@@ -311,6 +315,23 @@ static void obi_ui_read_status(void)
   lcd_string(0U, 3U, "PRESS: REFRESH");
 }
 
+static void obi_ui_set_led(uint8_t enabled)
+{
+  MakitaObiResult result = (enabled != 0U) ? makita_obi_led_on() :
+                                                makita_obi_led_off();
+
+  if (result != MAKITA_OBI_OK)
+  {
+    obi_ui_show_error(result);
+    return;
+  }
+
+  lcd_clear();
+  lcd_string(0U, 0U, "LED TEST");
+  lcd_string(0U, 1U, (enabled != 0U) ? "LED ON OK" : "LED OFF OK");
+  lcd_string(0U, 3U, "PRESS: REPEAT");
+}
+
 void obi_ui_init(void)
 {
   selected_item = OBI_UI_ROM;
@@ -356,6 +377,12 @@ void obi_ui_activate(void)
       break;
     case OBI_UI_STATUS:
       obi_ui_read_status();
+      break;
+    case OBI_UI_LED_ON:
+      obi_ui_set_led(1U);
+      break;
+    case OBI_UI_LED_OFF:
+      obi_ui_set_led(0U);
       break;
     default:
       obi_ui_show_menu();

@@ -454,3 +454,49 @@ MakitaObiResult makita_obi_read_status(MakitaObiStatus *status)
   }
   return result;
 }
+
+static MakitaObiResult obi_send_acknowledged_33(const uint8_t *command,
+                                                uint8_t command_length)
+{
+  uint8_t response[MAKITA_OBI_ROM_SIZE + 1U];
+  MakitaObiResult result;
+
+  memset(response, 0xFF, sizeof(response));
+  obi_power_on();
+  result = obi_command_33(command, command_length, response, 1U);
+  obi_power_off();
+
+  if ((result == MAKITA_OBI_OK) && (response[MAKITA_OBI_ROM_SIZE] != 0x06U))
+  {
+    result = MAKITA_OBI_BAD_RESPONSE;
+  }
+  return result;
+}
+
+static MakitaObiResult obi_set_battery_led(uint8_t enabled)
+{
+  static const uint8_t test_mode_command[] = {0xD9U, 0x96U, 0xA5U};
+  static const uint8_t led_on_command[] = {0xDAU, 0x31U};
+  static const uint8_t led_off_command[] = {0xDAU, 0x34U};
+  const uint8_t *led_command = (enabled != 0U) ? led_on_command : led_off_command;
+  MakitaObiResult result;
+
+  result = obi_send_acknowledged_33(test_mode_command, sizeof(test_mode_command));
+  if (result != MAKITA_OBI_OK)
+  {
+    return result;
+  }
+
+  HAL_Delay(50U);
+  return obi_send_acknowledged_33(led_command, sizeof(led_on_command));
+}
+
+MakitaObiResult makita_obi_led_on(void)
+{
+  return obi_set_battery_led(1U);
+}
+
+MakitaObiResult makita_obi_led_off(void)
+{
+  return obi_set_battery_led(0U);
+}

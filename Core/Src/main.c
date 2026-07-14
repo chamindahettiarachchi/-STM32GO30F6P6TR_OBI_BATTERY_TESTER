@@ -13,6 +13,7 @@
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
   *
+  STM32GO30F6P6TR_OBI_BATTERY_TESTER
   ******************************************************************************
   */
 /* USER CODE END Header */
