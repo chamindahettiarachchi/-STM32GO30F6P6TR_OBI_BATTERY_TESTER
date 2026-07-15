@@ -5,7 +5,7 @@
 #include "makita_obi.h"
 #include "st7567.h"
 
-#define OBI_UI_ITEM_COUNT 7U
+#define OBI_UI_ITEM_COUNT 8U
 #define OBI_UI_LINE_SIZE 20U
 
 enum
@@ -16,7 +16,8 @@ enum
   OBI_UI_TEMPERATURE,
   OBI_UI_STATUS,
   OBI_UI_LED_ON,
-  OBI_UI_LED_OFF
+  OBI_UI_LED_OFF,
+  OBI_UI_CLEAR_ERRORS
 };
 
 static const char *const menu_names[OBI_UI_ITEM_COUNT] =
@@ -27,7 +28,8 @@ static const char *const menu_names[OBI_UI_ITEM_COUNT] =
   "TEMPERATURE",
   "STATUS",
   "LED ON",
-  "LED OFF"
+  "LED OFF",
+  "CLEAR ERRORS"
 };
 
 static uint8_t selected_item;
@@ -332,6 +334,23 @@ static void obi_ui_set_led(uint8_t enabled)
   lcd_string(0U, 3U, "PRESS: REPEAT");
 }
 
+static void obi_ui_clear_errors_result(uint8_t success)
+{
+  lcd_clear();
+  lcd_string(0U, 0U, "CLEAR ERRORS");
+  if (success != 0U)
+  {
+    lcd_string(0U, 1U, "COMMAND SENT");
+    lcd_string(0U, 2U, "READ STATUS");
+  }
+  else
+  {
+    lcd_string(0U, 1U, "FAILED");
+    lcd_string(0U, 2U, "CHECK PINS");
+  }
+  lcd_string(0U, 3U, "PRESS: RETRY");
+}
+
 void obi_ui_init(void)
 {
   selected_item = OBI_UI_ROM;
@@ -383,6 +402,9 @@ void obi_ui_activate(void)
       break;
     case OBI_UI_LED_OFF:
       obi_ui_set_led(0U);
+      break;
+    case OBI_UI_CLEAR_ERRORS:
+      obi_ui_clear_errors_result(makita_clear_errors());
       break;
     default:
       obi_ui_show_menu();

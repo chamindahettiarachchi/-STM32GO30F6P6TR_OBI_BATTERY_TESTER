@@ -18,7 +18,7 @@ temperature, and status information and can issue battery LED test commands.
 - Detection of no-battery and invalid all-`00`/all-`FF` responses
 - Debug and Release CMake presets for GNU Arm Embedded
 
-The current menu contains seven operations:
+The current menu contains eight operations:
 
 1. Read the 8-byte ROM identifier
 2. Read the battery model
@@ -28,9 +28,10 @@ The current menu contains seven operations:
 5. Read lock status, status code, capacity, charge cycles, and date data
 6. Turn the battery indicator LED on
 7. Turn the battery indicator LED off
+8. Clear battery error state using the OBI test-mode reset sequence
 
-Battery clear-errors/reset commands are  not included. 
-
+The clear-errors action mirrors the command flow used in the reference Makita
+OBI examples and reports success or failure on the LCD.
 
 ## Hardware
 

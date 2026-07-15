@@ -491,6 +491,52 @@ static MakitaObiResult obi_set_battery_led(uint8_t enabled)
   return obi_send_acknowledged_33(led_command, sizeof(led_on_command));
 }
 
+uint8_t makita_clear_errors(void)
+{
+  static const uint8_t status_command[] = {0xAAU, 0x00U};
+  static const uint8_t model_command[] = {0xDCU, 0x0CU};
+  static const uint8_t test_mode_command[] = {0xD9U, 0x96U, 0xA5U};
+  static const uint8_t clear_errors_command[] = {0xDAU, 0x04U};
+  uint8_t status_response[MAKITA_OBI_ROM_SIZE + 40U];
+  uint8_t model_response[16U];
+  MakitaObiResult result;
+
+  memset(status_response, 0xFF, sizeof(status_response));
+  memset(model_response, 0xFF, sizeof(model_response));
+
+  obi_power_on();
+  result = obi_command_33(status_command, sizeof(status_command), status_response, 40U);
+  obi_power_off();
+  if (result != MAKITA_OBI_OK)
+  {
+    return 0U;
+  }
+
+  HAL_Delay(50U);
+
+  obi_power_on();
+  result = obi_command_cc(model_command, sizeof(model_command),
+                          model_response, sizeof(model_response));
+  obi_power_off();
+  if (result != MAKITA_OBI_OK)
+  {
+    return 0U;
+  }
+
+  HAL_Delay(50U);
+
+  result = obi_send_acknowledged_33(test_mode_command, sizeof(test_mode_command));
+  if (result != MAKITA_OBI_OK)
+  {
+    return 0U;
+  }
+
+  HAL_Delay(50U);
+
+  result = obi_send_acknowledged_33(clear_errors_command, sizeof(clear_errors_command));
+  return (result == MAKITA_OBI_OK) ? 1U : 0U;
+}
+
 MakitaObiResult makita_obi_led_on(void)
 {
   return obi_set_battery_led(1U);
@@ -500,3 +546,6 @@ MakitaObiResult makita_obi_led_off(void)
 {
   return obi_set_battery_led(0U);
 }
+
+
+

@@ -49,5 +49,6 @@ MakitaObiResult makita_obi_read_temperature(MakitaObiTemperature *temperature);
 MakitaObiResult makita_obi_read_status(MakitaObiStatus *status);
 MakitaObiResult makita_obi_led_on(void);
 MakitaObiResult makita_obi_led_off(void);
+uint8_t makita_clear_errors(void);
 
 #endif /* MAKITA_OBI_H */
